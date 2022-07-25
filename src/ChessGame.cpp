@@ -1,39 +1,45 @@
-#include <iostream>
+#include <ChessGame.hpp>
 #include <SDLpp/Lib.hpp>
-#include <SDLpp/Window.hpp>
 #include <SDL.h>
 
-int main(int argc, char** argv)
+ChessGame::ChessGame(SDLpp::Lib& sdl) :
+m_sdl(sdl)
 {
-	try
+	constexpr int WindowWidth = 1280;
+	constexpr int WindowHeight = 720;
+
+	m_window = SDLpp::Window("ChessGame", WindowWidth, WindowHeight);
+	m_renderer = m_window.CreateRenderer();
+
+	m_players.emplace_back();
+	m_players.emplace_back();
+
+	m_resources = Resources::Load(m_renderer);
+	m_boardDrawer.emplace(m_resources, WindowWidth, WindowHeight);
+}
+
+int ChessGame::Run()
+{
+	bool opened = true;
+	while (opened)
 	{
-		SDLpp::Lib sdl;
-
-		SDLpp::Window window("ChessGame", 1280, 720);
-		SDLpp::Renderer renderer = window.CreateRenderer();
-
-		bool opened = true;
-		while (opened)
+		SDL_Event event;
+		while (m_sdl.PollEvent(&event))
 		{
-			SDL_Event event;
-			while (sdl.PollEvent(&event))
+			switch (event.type)
 			{
-				switch (event.type)
-				{
-					case SDL_QUIT:
-						opened = false;
-						break;
-				}
+				case SDL_QUIT:
+					opened = false;
+					break;
 			}
-
-			renderer.SetDrawColor(128, 128, 255, 255);
-			renderer.Clear();
-			renderer.Present();
 		}
+
+		m_renderer.SetDrawColor(128, 128, 255, 255);
+		m_renderer.Clear();
+		
+		m_boardDrawer->Draw(m_renderer, m_board);
+
+		m_renderer.Present();
 	}
-	catch (const std::exception& e)
-	{
-		std::cerr << e.what() << std::endl;
-		return 0;
-	}
+	return 0;
 }

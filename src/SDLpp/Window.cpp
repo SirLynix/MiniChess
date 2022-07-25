@@ -23,12 +23,6 @@ namespace SDLpp
 			throw std::runtime_error(std::string("failed to create window: ") + SDL_GetError());
 	}
 
-	Window::Window(Window&& window) noexcept :
-	m_handle(window.m_handle)
-	{
-		window.m_handle = nullptr;
-	}
-
 	Window::~Window()
 	{
 		if (m_handle)
@@ -43,13 +37,5 @@ namespace SDLpp
 			throw std::runtime_error(std::string("failed to create renderer: ") + SDL_GetError());
 
 		return Renderer(renderer);
-	}
-	
-	Window& Window::operator=(Window&& window) noexcept
-	{
-		using std::swap;
-		swap(m_handle, window.m_handle);
-
-		return *this;
 	}
 }
