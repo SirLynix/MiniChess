@@ -8,7 +8,7 @@
 
 namespace SDLpp
 {
-	Texture::Texture(SDL_Texture* handle) :
+	Texture::Texture(SDL_Texture* handle, ConstructToken) :
 	m_handle(handle)
 	{
 	}
@@ -38,7 +38,7 @@ namespace SDLpp
 		return SDL_QueryTexture(const_cast<SDL_Texture*>(m_handle.Get()), format, access, width, height); //< SDL is not const-correct
 	}
 	
-	Texture Texture::LoadFromFile(Renderer& renderer, const std::string& filepath)
+	std::shared_ptr<Texture> Texture::LoadFromFile(Renderer& renderer, const std::string& filepath)
 	{
 		Surface surface = Surface::LoadFromFile(filepath);
 		return renderer.CreateTextureFromSurface(surface);

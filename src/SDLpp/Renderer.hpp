@@ -1,11 +1,10 @@
 #pragma once
 
 #include <MovablePtr.hpp>
+#include <SDL.h>
 #include <cstdint>
+#include <memory>
 #include <string>
-
-struct SDL_Renderer;
-struct SDL_Rect;
 
 namespace SDLpp
 {
@@ -23,12 +22,14 @@ namespace SDLpp
 
 			void Clear();
 
-			Texture CreateTextureFromSurface(const Surface& surface);
+			std::shared_ptr<Texture> CreateTextureFromSurface(const Surface& surface);
 
 			void Present();
 
 			void RenderCopy(const Texture& texture);
 			void RenderCopy(const Texture& texture, const SDL_Rect& destinationRect);
+			void RenderCopy(const Texture& texture, const SDL_Rect& sourceRect, const SDL_Rect& destinationRect);
+			void RenderCopy(const Texture& texture, const SDL_Rect& sourceRect, const SDL_Rect& destinationRect, double angle, const SDL_Point& center, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
 			void SetDrawColor(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a);
 

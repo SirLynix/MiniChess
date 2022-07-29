@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 class Board;
 class Resources;
 
@@ -20,6 +22,8 @@ class BoardDrawer
 
 		BoardDrawer& operator=(const BoardDrawer&) = delete;
 		BoardDrawer& operator=(BoardDrawer&&) = default;
+
+		static constexpr std::size_t CellSize = 64;
 
 	private:
 		const Resources& m_resources;

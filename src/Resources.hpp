@@ -1,15 +1,26 @@
 #pragma once
 
-#include <SDLpp/Texture.hpp>
+#include <SDLpp/Sprite.hpp>
+#include <PieceType.hpp>
+#include <array>
+#include <memory>
 
 namespace SDLpp
 {
 	class Renderer;
+	class Texture;
 }
 
 struct Resources
 {
-	SDLpp::Texture marbleAndStoneBoard;
+	std::array<SDLpp::Sprite, PieceCount> blackPiecesSprites;
+	std::array<SDLpp::Sprite, PieceCount> whitePiecesSprites;
+	std::shared_ptr<SDLpp::Texture> marbleAndStoneBoardTexture;
+	std::shared_ptr<SDLpp::Texture> blackPiecesTexture;
+	std::shared_ptr<SDLpp::Texture> whitePiecesTexture;
+
+	int pieceCenterOffsetX;
+	int pieceCenterOffsetY;
 
 	static Resources Load(SDLpp::Renderer& renderer);
 };
