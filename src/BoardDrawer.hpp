@@ -18,7 +18,9 @@ class BoardDrawer
 		BoardDrawer(BoardDrawer&&) = default;
 		~BoardDrawer() = default;
 
-		void Draw(SDLpp::Renderer& renderer, const Board& board);
+		void Draw(SDLpp::Renderer& renderer, const Board& board) const;
+
+		bool GetHoveringPiece(int x, int y, std::size_t& cellX, std::size_t& cellY) const;
 
 		BoardDrawer& operator=(const BoardDrawer&) = delete;
 		BoardDrawer& operator=(BoardDrawer&&) = default;

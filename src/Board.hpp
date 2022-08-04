@@ -14,9 +14,13 @@ class Board
 		Board(Board&&) = default;
 		~Board() = default;
 
+		void ClearCell(std::size_t x, std::size_t y);
+
 		const CellContent* GetCell(std::size_t x, std::size_t y) const;
 
 		void Reset();
+
+		void UpdateCell(std::size_t x, std::size_t y, PieceType pieceType, std::size_t ownerIndex);
 
 		Board& operator=(const Board&) = delete;
 		Board& operator=(Board&&) = default;
@@ -31,5 +35,8 @@ class Board
 		};
 
 	private:
+		std::optional<CellContent>& AccessCell(std::size_t x, std::size_t y);
+		const std::optional<CellContent>& AccessCell(std::size_t x, std::size_t y) const;
+
 		std::array<std::optional<CellContent>, Width * Height> m_cells;
 };

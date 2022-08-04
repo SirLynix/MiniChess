@@ -12,7 +12,7 @@ m_width(width)
 {
 }
 
-void BoardDrawer::Draw(SDLpp::Renderer& renderer, const Board& board)
+void BoardDrawer::Draw(SDLpp::Renderer& renderer, const Board& board) const
 {
 	SDL_Rect textureRect = m_resources.marbleAndStoneBoardTexture->GetRect();
 	textureRect.x = m_width / 2 - textureRect.w / 2;
@@ -28,19 +28,47 @@ void BoardDrawer::Draw(SDLpp::Renderer& renderer, const Board& board)
 	{
 		for (std::size_t x = 0; x < Board::Width; ++x)
 		{
-			const Board::CellContent* content = board.GetCell(x, y);
-			if (!content)
-				continue;
+			std::size_t cellX = x;
+			std::size_t cellY = y;
+			std::swap(cellX, cellY);
+			cellX = Board::Width - cellX - 1;
 
-			const auto& pieceSprites = (content->ownerIndex == 1) ? m_resources.blackPiecesSprites : m_resources.whitePiecesSprites;
-			const auto& sprite = pieceSprites[static_cast<std::size_t>(content->pieceType)];
+			const Board::CellContent* content = board.GetCell(cellX, cellY);
+			if (content)
+			{
+				const auto& pieceSprites = (content->ownerIndex == 1) ? m_resources.blackPiecesSprites : m_resources.whitePiecesSprites;
+				const auto& sprite = pieceSprites[static_cast<std::size_t>(content->pieceType)];
 
-			SDL_RendererFlip flipFlags = (content->ownerIndex == 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
+				SDL_RendererFlip flipFlags = (content->ownerIndex == 1) ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
 
-			sprite.Render(renderer, drawX, drawY, flipFlags);
-			drawY += CellSize;
+				sprite.Render(renderer, drawX, drawY, flipFlags);
+			}
+
+			drawX += CellSize;
 		}
-		drawX += CellSize;
-		drawY = textureRect.y + CellSize / 2;
+		drawY += CellSize;
+		drawX = textureRect.x + CellSize / 2;
 	}
+}
+
+bool BoardDrawer::GetHoveringPiece(int x, int y, std::size_t& cellX, std::size_t& cellY) const
+{
+	SDL_Rect textureRect = m_resources.marbleAndStoneBoardTexture->GetRect();
+	textureRect.x = m_width / 2 - textureRect.w / 2;
+	textureRect.y = m_height / 2 - textureRect.h / 2;
+
+	if (x < textureRect.x || y < textureRect.y)
+		return false;
+
+	if (x >= textureRect.x + Board::Width * CellSize ||
+		y >= textureRect.y + Board::Height * CellSize)
+		return false;
+
+	cellX = (x - textureRect.x) / CellSize;
+	cellY = (y - textureRect.y) / CellSize;
+
+	std::swap(cellX, cellY);
+	cellX = Board::Width - cellX - 1;
+
+	return true;
 }
