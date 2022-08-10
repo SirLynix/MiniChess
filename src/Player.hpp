@@ -10,8 +10,6 @@ class ChessGame;
 class Player
 {
 	public:
-		using MoveCallback = std::function<bool(std::size_t fromX, std::size_t fromY, std::size_t toX, std::size_t toY)>;
-
 		Player(ChessGame& game, std::size_t playerIndex);
 		Player(const Player&) = delete;
 		Player(Player&&) = default;
@@ -19,7 +17,7 @@ class Player
 
 		void HandleEvent(const SDL_Event& event);
 
-		void StartTurn(MoveCallback callback);
+		void StartTurn();
 
 		Player& operator=(const Player&) = delete;
 		Player& operator=(Player&&) = default;
@@ -32,7 +30,6 @@ class Player
 		};
 
 		ChessGame& m_game;
-		MoveCallback m_moveCallback;
 		std::optional<SelectedPiece> m_selectedPiece;
 		std::size_t m_playerIndex;
 };

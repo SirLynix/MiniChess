@@ -3,10 +3,13 @@
 #include <SDLpp/Renderer.hpp>
 #include <SDLpp/Texture.hpp>
 #include <SDLpp/Window.hpp>
+#include <MovementRules/MovementRule.hpp>
 #include <Board.hpp>
 #include <BoardDrawer.hpp>
 #include <Player.hpp>
+#include <PieceType.hpp>
 #include <Resources.hpp>
+#include <array>
 #include <optional>
 #include <vector>
 
@@ -17,6 +20,8 @@ namespace SDLpp
 
 class ChessGame
 {
+	friend class Player;
+
 	public:
 		ChessGame(SDLpp::Lib& sdl);
 		ChessGame(const ChessGame&) = delete;
@@ -34,9 +39,16 @@ class ChessGame
 		static constexpr std::size_t PlayerCount = 2;
 
 	private:
+		bool CheckMovement(PieceType pieceType, std::size_t fromX, std::size_t fromY, std::size_t toX, std::size_t toY) const;
+
+		void InitMovementRules();
+
 		bool MovePiece(std::size_t fromX, std::size_t fromY, std::size_t toX, std::size_t toY);
 
 		void NextTurn();
+
+		void NotifyPieceDeselection();
+		void NotifyPieceSelection(std::size_t cellX, std::size_t cellY);
 
 		SDLpp::Lib& m_sdl;
 		SDLpp::Window m_window;
@@ -46,4 +58,5 @@ class ChessGame
 		Board m_board;
 		std::optional<BoardDrawer> m_boardDrawer;
 		std::size_t m_currentPlayer;
+		std::array<std::vector<std::unique_ptr<MovementRule>>, PieceCount> m_movementRules;
 };

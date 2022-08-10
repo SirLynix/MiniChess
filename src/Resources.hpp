@@ -18,6 +18,7 @@ struct Resources
 	std::shared_ptr<SDLpp::Texture> marbleAndStoneBoardTexture;
 	std::shared_ptr<SDLpp::Texture> blackPiecesTexture;
 	std::shared_ptr<SDLpp::Texture> whitePiecesTexture;
+	SDLpp::Sprite selectionOverlaySprite;
 
 	int pieceCenterOffsetX;
 	int pieceCenterOffsetY;

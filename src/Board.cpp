@@ -52,6 +52,11 @@ void Board::UpdateCell(std::size_t x, std::size_t y, PieceType pieceType, std::s
 	};
 }
 
+std::size_t Board::GetCellIndex(std::size_t x, std::size_t y)
+{
+	return y * Width + x;
+}
+
 auto Board::AccessCell(std::size_t x, std::size_t y) -> std::optional<CellContent>&
 {
 	assert(x < Width);
