@@ -21,30 +21,32 @@ void Player::HandleEvent(const SDL_Event& event)
 			std::size_t cellX, cellY;
 			if (boardDrawer.GetHoveringCell(event.button.x, event.button.y, cellX, cellY))
 			{
-				if (!m_selectedPiece)
+				if (const Board::CellContent* content = board.GetCell(cellX, cellY))
 				{
-					if (const Board::CellContent* content = board.GetCell(cellX, cellY))
+					if (content->ownerIndex == m_playerIndex)
 					{
-						if (content->ownerIndex == m_playerIndex)
+						if (m_selectedPiece)
 						{
-							m_selectedPiece = SelectedPiece{ cellX, cellY };
-							m_game.NotifyPieceSelection(cellX, cellY);
+							const SelectedPiece& selectedPiece = *m_selectedPiece;
+							if (selectedPiece.x == cellX && selectedPiece.y == cellY)
+							{
+								m_selectedPiece.reset(); //< unselect
+								m_game.NotifyPieceDeselection();
+								break;
+							}
 						}
+
+						m_selectedPiece = SelectedPiece{ cellX, cellY };
+						m_game.NotifyPieceSelection(cellX, cellY);
+						break;
 					}
 				}
-				else
+
+				if (m_selectedPiece)
 				{
 					const SelectedPiece& selectedPiece = *m_selectedPiece;
-					if (selectedPiece.x == cellX && selectedPiece.y == cellY)
-					{
-						m_selectedPiece.reset(); //< unselect
-						m_game.NotifyPieceDeselection();
-					}
-					else
-					{
-						if (m_game.MovePiece(selectedPiece.x, selectedPiece.y, cellX, cellY))
-							m_selectedPiece.reset();
-					}
+					if (m_game.MovePiece(selectedPiece.x, selectedPiece.y, cellX, cellY))
+						m_selectedPiece.reset();
 				}
 			}
 			break;

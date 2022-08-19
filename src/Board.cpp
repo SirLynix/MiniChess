@@ -57,6 +57,17 @@ std::size_t Board::GetCellIndex(std::size_t x, std::size_t y)
 	return y * Width + x;
 }
 
+std::size_t Board::GetDistance(std::size_t from, std::size_t to)
+{
+	std::size_t distance;
+	if (to > from)
+		distance = (to - from);
+	else
+		distance = (from - to);
+
+	return distance;
+}
+
 auto Board::AccessCell(std::size_t x, std::size_t y) -> std::optional<CellContent>&
 {
 	assert(x < Width);

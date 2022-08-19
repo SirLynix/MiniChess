@@ -8,6 +8,8 @@ Resources Resources::Load(SDLpp::Renderer& renderer)
 	Resources resources;
 	resources.marbleAndStoneBoardTexture = SDLpp::Texture::LoadFromFile(renderer, "resources/Top Down/Boards/Full Boards/Marble and Stone 512x552.png");
 	
+	auto movementOverlayTexture = SDLpp::Texture::LoadFromFile(renderer, "resources/movement_overlay.png");
+	resources.movementOverlaySprite = SDLpp::Sprite(std::move(movementOverlayTexture), SDL_Rect{ 0, 0, 64, 64 }, SDL_Point{ 32, 32 });
 	auto selectionOverlayTexture = SDLpp::Texture::LoadFromFile(renderer, "resources/selection_overlay.png");
 	resources.selectionOverlaySprite = SDLpp::Sprite(std::move(selectionOverlayTexture), SDL_Rect{ 0, 0, 64, 64 }, SDL_Point{ 32, 32 });
 

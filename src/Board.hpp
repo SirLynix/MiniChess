@@ -23,6 +23,7 @@ class Board
 		void UpdateCell(std::size_t x, std::size_t y, PieceType pieceType, std::size_t ownerIndex);
 
 		static std::size_t GetCellIndex(std::size_t x, std::size_t y);
+		static std::size_t GetDistance(std::size_t from, std::size_t to);
 
 		Board& operator=(const Board&) = delete;
 		Board& operator=(Board&&) = default;

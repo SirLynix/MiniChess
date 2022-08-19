@@ -3,13 +3,15 @@
 #include <SDL.h>
 #include <MovementRules/DiagonalMovementRule.hpp>
 #include <MovementRules/HorizontalVerticalMovementRule.hpp>
+#include <MovementRules/KnightMovementRule.hpp>
+#include <MovementRules/PawnMovementRule.hpp>
 #include <cassert>
 #include <iostream>
 #include <limits>
 
 ChessGame::ChessGame(SDLpp::Lib& sdl) :
 m_sdl(sdl),
-m_currentPlayer(std::numeric_limits<std::size_t>::max()) //< so that next player is player #0
+m_currentPlayer(WhitePlayerIndex - 1) //< so that next player is White
 {
 	constexpr int WindowWidth = 1280;
 	constexpr int WindowHeight = 720;
@@ -74,11 +76,11 @@ int ChessGame::Run()
 	return 0;
 }
 
-bool ChessGame::CheckMovement(PieceType pieceType, std::size_t fromX, std::size_t fromY, std::size_t toX, std::size_t toY) const
+bool ChessGame::CheckMovement(PieceType pieceType, std::size_t playerIndex, std::size_t fromX, std::size_t fromY, std::size_t toX, std::size_t toY) const
 {
 	for (const auto& movementRulePtr : m_movementRules[static_cast<std::size_t>(pieceType)])
 	{
-		if (movementRulePtr->CheckMovement(fromX, fromY, toX, toY))
+		if (movementRulePtr->CheckMovement(m_board, playerIndex, fromX, fromY, toX, toY))
 			return true;
 	}
 
@@ -96,6 +98,8 @@ void ChessGame::InitMovementRules()
 
 	AddRule(PieceType::Rook, std::make_unique<HorizontalVerticalMovementRule>(InfiniteDistance));
 	AddRule(PieceType::Bishop, std::make_unique<DiagonalMovementRule>(InfiniteDistance));
+	AddRule(PieceType::Knight, std::make_unique<KnightMovementRule>(2, 1));
+	AddRule(PieceType::Pawn, std::make_unique<PawnMovementRule>());
 
 	AddRule(PieceType::Queen, std::make_unique<HorizontalVerticalMovementRule>(InfiniteDistance));
 	AddRule(PieceType::Queen, std::make_unique<DiagonalMovementRule>(InfiniteDistance));
@@ -115,7 +119,7 @@ bool ChessGame::MovePiece(std::size_t fromX, std::size_t fromY, std::size_t toX,
 
 	PieceType pieceType = cellContent->pieceType;
 
-	if (CheckMovement(pieceType, fromX, fromY, toX, toY))
+	if (CheckMovement(pieceType, m_currentPlayer, fromX, fromY, toX, toY))
 	{
 		m_board.ClearCell(fromX, fromY);
 		m_board.UpdateCell(toX, toY, pieceType, m_currentPlayer);
@@ -132,17 +136,19 @@ bool ChessGame::MovePiece(std::size_t fromX, std::size_t fromY, std::size_t toX,
 
 void ChessGame::NextTurn()
 {
-	m_boardDrawer->ClearOverlay();
+	m_boardDrawer->ClearMovementOverlay();
+	m_boardDrawer->ClearSelectionOverlay();
 
 	m_currentPlayer = (m_currentPlayer + 1) % m_players.size();
 	m_players[m_currentPlayer].StartTurn();
 
-	std::cout << ((m_currentPlayer == 0) ? "White" : "Black") << " turn" << std::endl;
+	std::cout << ((m_currentPlayer == WhitePlayerIndex) ? "White" : "Black") << " turn" << std::endl;
 }
 
 void ChessGame::NotifyPieceDeselection()
 {
-	m_boardDrawer->ClearOverlay();
+	m_boardDrawer->ClearMovementOverlay();
+	m_boardDrawer->ClearSelectionOverlay();
 }
 
 void ChessGame::NotifyPieceSelection(std::size_t cellX, std::size_t cellY)
@@ -152,9 +158,10 @@ void ChessGame::NotifyPieceSelection(std::size_t cellX, std::size_t cellY)
 	if (!selectedCell)
 		return;
 
+	m_boardDrawer->EnableSelectionOverlay(cellX, cellY);
 	for (std::size_t y = 0; y < Board::Height; ++y)
 	{
 		for (std::size_t x = 0; x < Board::Width; ++x)
-			m_boardDrawer->EnableOverlay(x, y, CheckMovement(selectedCell->pieceType, cellX, cellY, x, y));
+			m_boardDrawer->EnableMovementOverlay(x, y, CheckMovement(selectedCell->pieceType, m_currentPlayer, cellX, cellY, x, y));
 	}
 }
